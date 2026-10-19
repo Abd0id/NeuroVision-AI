@@ -138,6 +138,7 @@ def find_serialized_models(models_dir: str = "models") -> List[Dict[str, Any]]:
         return found
 
     # Search for files with .keras, .h5, .hdf5 extensions
+    found_stems = set()
     for ext in ("*.keras", "*.h5", "*.hdf5"):
         for path in base_path.glob(ext):
             stat = path.stat()
@@ -149,18 +150,28 @@ def find_serialized_models(models_dir: str = "models") -> List[Dict[str, Any]]:
                 "size_mb": size_mb,
                 "modified": stat.st_mtime,
             })
+            found_stems.add(path.stem)
 
-    # Search for SavedModel directories (containing saved_model.pb)
+    # Search for directory models (Keras 3 directory or TensorFlow SavedModel)
     for path in base_path.iterdir():
-        if path.is_dir() and (path / "saved_model.pb").exists():
-            stat = path.stat()
-            found.append({
-                "path": str(path),
-                "filename": path.name + " (SavedModel)",
-                "type": "saved_model_dir",
-                "size_mb": 0.0,
-                "modified": stat.st_mtime,
-            })
+        if path.is_dir() and path.name not in found_stems:
+            # Check for Keras 3 format (config.json + model.weights.h5)
+            is_keras3_dir = (path / "config.json").exists()
+            is_saved_model = (path / "saved_model.pb").exists()
+
+            if is_keras3_dir or is_saved_model:
+                # Calculate total directory size
+                total_bytes = sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+                size_mb = round(total_bytes / (1024 * 1024), 2)
+                model_type = "keras_dir" if is_keras3_dir else "saved_model_dir"
+
+                found.append({
+                    "path": str(path),
+                    "filename": f"{path.name} (Directory)",
+                    "type": model_type,
+                    "size_mb": size_mb,
+                    "modified": path.stat().st_mtime,
+                })
 
     # Sort most recently modified first
     found.sort(key=lambda x: x["modified"], reverse=True)
