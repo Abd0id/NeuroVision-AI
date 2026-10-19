@@ -1,8 +1,8 @@
-# NeuroVision AI 🧠
+# NeuroVision AI 
 
 Intelligent Brain MRI Classification & Grad-CAM Visual Explainability Platform.
 
-## 📌 Overview
+## Overview
 
 **NeuroVision AI** provides deep learning-driven brain MRI analysis to assist researchers and clinicians in detecting and categorizing brain tumors from axial, coronal, and sagittal MRI scans.
 
@@ -14,7 +14,7 @@ Intelligent Brain MRI Classification & Grad-CAM Visual Explainability Platform.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Requirements & Dependencies
 Ensure dependencies are installed using `uv`:
@@ -47,7 +47,7 @@ The web dashboard will be available at `http://localhost:8501`.
 
 ---
 
-## 🌟 Application Features
+## Application Features
 
 1. **Model Hub & Hot-Swapping**:
    - Automatically detects, inspects, and loads serialized models from `models/`.
